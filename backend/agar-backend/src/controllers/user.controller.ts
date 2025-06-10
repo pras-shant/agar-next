@@ -74,6 +74,7 @@ class UserController {
    async verifySignature(req: Request, res: Response) {
     try {
       const { message, signature, expectedAddress, nonce } = req.body;
+      console.log(req.body,'body data')
 
       // Validate input
       if (!message || !signature || !expectedAddress || !nonce) {

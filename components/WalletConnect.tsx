@@ -23,18 +23,12 @@ export const WalletConnect = () => {
         const createNonceResponse = await fetch(`http://localhost:3000/api/users/generate-nonce`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address }),
+          body: JSON.stringify({ user_address: address }),
         });
         if (!createNonceResponse.ok) throw new Error("Failed to create nonce");
-    
-        // Step 2: Fetch the nonce
-        const response = await fetch(`http://localhost:3000/api/users/get-nonce?address=${address}`, {
-          method: 'GET',
-        });
-        if (!response.ok) throw new Error("Failed to fetch nonce");
-    
-        const data = await response.json();
-        setNonce(data.nonce);
+
+          const data = await createNonceResponse.json();
+        setNonce( data.nonce);
         console.log("Fetched nonce:", data.nonce);
       } catch (error) {
         console.error("Error in nonce workflow:", error);
@@ -62,12 +56,17 @@ export const WalletConnect = () => {
     
         // Sign the message using the wallet provider
         const signedMessage = await walletProvider.signMessage(encodedMessage);
+        console.log(signedMessage,'signed message')
         if (!signedMessage) {
           throw new Error("Message signing failed");
         }
-    
+        const hexSignature = Array.from(new Uint8Array(signedMessage))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+
+    console.log("Signed message (Hex):", hexSignature);
         // Set the signature state
-        setSignature(signedMessage);
+        setSignature(hexSignature);
         console.log("Signed message:", signedMessage);
       } catch (error) {
         console.error("Error signing message:", error);

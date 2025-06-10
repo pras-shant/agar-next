@@ -38,13 +38,16 @@ class UserService {
   ): Promise<boolean> {
     // Check if the nonce exists and matches
     const user = await UserDAO.findByWalletAddress(expectedAddress);
+    console.log(user)
+
+    
     if (!user || user.nonce !== nonce) {
       throw new Error('Invalid or expired nonce.');
     }
 
     // Recover the address from the signature
     const recoveredAddress = ethers.verifyMessage(message, signature);
-
+console.log(recoveredAddress,'recoverr')
     // Validate the recovered address
     return recoveredAddress.toLowerCase() === expectedAddress.toLowerCase();
   }
