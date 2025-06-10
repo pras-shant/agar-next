@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                  // Target latest features available in Node.js
+    "module": "CommonJS",               // CommonJS for Node.js compatibility
+    "rootDir": "./src",                 // Source code directory
+    "outDir": "./dist",                 // Output directory for compiled files
+    "strict": true,                     // Enable strict type-checking options
+    "esModuleInterop": true,            // Enable compatibility with ES modules
+    "skipLibCheck": true,               // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Ensure file names use consistent casing
+    "resolveJsonModule": true,          // Allow importing .json files
+    "moduleResolution": "node",         // Resolve modules like Node.js
+    "noImplicitReturns": true,          // Ensure all code paths in a function return a value
+    "noUnusedLocals": true,             // Report errors on unused local variables
+    "noUnusedParameters": true,         // Report errors on unused parameters
+    "noImplicitAny": true,              // Raise error for variables with implicit "any" type
+    "useUnknownInCatchVariables": true, // Use "unknown" for catch clause variables
+    "lib": ["ES2020"],                  // Include ECMAScript 2020 features
+    "typeRoots": ["./node_modules/@types"], // Type declaration files
+    "allowSyntheticDefaultImports": true // Allow default imports from modules without default exports
+  },
+  "include": ["src/**/*.ts"],           // Include all .ts files in the src directory
+  "exclude": ["node_modules", "dist"]   // Exclude node_modules and dist directories
+}
