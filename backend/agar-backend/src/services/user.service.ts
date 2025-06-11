@@ -1,8 +1,8 @@
 import UserDAO from '../daos/user.dao';
 import { IUser } from '../models/user.model';
 import crypto from 'crypto';
-import { ethers } from 'ethers';
-
+import nacl from'tweetnacl'
+import bs58 from 'bs58'; // For decoding Base58 encoded data
 
 class UserService {
   async createUser(userData: Partial<IUser>): Promise<IUser> {
@@ -30,27 +30,36 @@ class UserService {
     return user?.nonce || null;
   }
 
-  async verifySignature(
+async verifySignature(
     message: string,
     signature: string,
     expectedAddress: string,
     nonce: string
-  ): Promise<boolean> {
-    // Check if the nonce exists and matches
+): Promise<boolean> {
     const user = await UserDAO.findByWalletAddress(expectedAddress);
-    console.log(user)
-
-    
     if (!user || user.nonce !== nonce) {
-      throw new Error('Invalid or expired nonce.');
+        throw new Error('Invalid or expired nonce.');
     }
 
-    // Recover the address from the signature
-    const recoveredAddress = ethers.verifyMessage(message, signature);
-console.log(recoveredAddress,'recoverr')
-    // Validate the recovered address
-    return recoveredAddress.toLowerCase() === expectedAddress.toLowerCase();
-  }
+
+    // Validate Base58 strings
+    const base58Regex = /^[A-HJ-NP-Za-km-z1-9]+$/;
+    if (!base58Regex.test(signature) || !base58Regex.test(expectedAddress)) {
+        throw new Error('Invalid Base58 string detected.');
+    }
+
+    const encodedMessage = new TextEncoder().encode(message);
+    const signatureBytes = bs58.decode(signature);
+    const publicKeyBytes = bs58.decode(expectedAddress);
+
+    const isSignatureValid = nacl.sign.detached.verify(
+        encodedMessage,
+        signatureBytes,
+        publicKeyBytes
+    );
+
+    return isSignatureValid;
+}
 }
 
 export default new UserService();

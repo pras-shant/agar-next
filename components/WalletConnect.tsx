@@ -1,8 +1,10 @@
-import Image from 'next/image';
 import React from 'react';
 import { ConnectButton } from "@/components/ConnectButton";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { useState } from "react";
+
+import bs58 from 'bs58';
+
 
 import type { Provider } from "@reown/appkit-adapter-solana";
 
@@ -56,18 +58,12 @@ export const WalletConnect = () => {
     
         // Sign the message using the wallet provider
         const signedMessage = await walletProvider.signMessage(encodedMessage);
-        console.log(signedMessage,'signed message')
-        if (!signedMessage) {
-          throw new Error("Message signing failed");
-        }
-        const hexSignature = Array.from(new Uint8Array(signedMessage))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("");
+      if (!signedMessage) {
+    throw new Error("Message signing failed");
+         }
 
-    console.log("Signed message (Hex):", hexSignature);
-        // Set the signature state
-        setSignature(hexSignature);
-        console.log("Signed message:", signedMessage);
+      const base58Signature = bs58.encode(new Uint8Array(signedMessage));
+        setSignature(base58Signature);
       } catch (error) {
         console.error("Error signing message:", error);
       }
@@ -75,31 +71,7 @@ export const WalletConnect = () => {
     
     
     
-    //   function SignMessage() {
-    //   // 0. Get account and provider
-    //   const { address } = useAppKitAccount();
-    //   const { walletProvider } = useAppKitProvider<Provider>("solana");
-    
-    //   // 1. Create a function to sign a message
-    //   async function onSignMessage() {
-    //     try {
-    //       if (!walletProvider || !address) {
-    //         throw Error("user is disconnected");
-    //       }
-    
-    //       // 2. Encode message and sign it
-    //       const encodedMessage = new TextEncoder().encode("Hello from AppKit");
-    //       const signature = await walletProvider.signMessage(encodedMessage);
-    
-    //       console.log(signature);
-    //     } catch (err) {
-    //       // Handle Error Here
-    //     }
-    //   }
-    
-    //   // 3. Create a button to trigger the function
-    //   return <button onClick={onSignMessage}>Sign Message</button>;
-    // }
+  
       const verifySignature = async (): Promise<void> => {
         if (!nonce || !signature || !address) {
           console.error("Nonce, signature, and address are required for verification.");
@@ -171,7 +143,6 @@ export const WalletConnect = () => {
              </button>
              <button
                onClick={verifySignature}
-               disabled={!nonce || !signature}
                className="bg-purple-500 text-white py-2 px-4 rounded-md"
              >
                Verify Signature
